@@ -9,12 +9,13 @@
 
 addpath(genpath(pwd));
 addpath utils/libsvm/matlab
-
+mydata=importdata('facePaths.txt');
+genderdata=importdata('faceGenderTrain.txt');
 % Initialize variables for calling datasets_feature function
 info = load('images/filelist.mat');
-datasets = {'demo'};
-train_lists = {cellstr(['faces/01.jpg'; 'faces/01.jpg'; 'faces/01.jpg'; 'faces/01.jpg'; 'faces/01.jpg'; 'faces/02.jpg'; 'faces/02.jpg'; 'faces/02.jpg'; 'faces/02.jpg'; 'faces/02.jpg'])};
-test_lists = {info.test_list};
+datasets = {'demo9'};
+train_lists = {cellstr(mydata(1:100))};
+test_lists = {cellstr(mydata(101:104))};
 feature = 'sift';
 
 % Load the configuration and set dictionary size to 20 (for fast demo)
@@ -42,7 +43,7 @@ test_features = load_feature(datasets{1}, feature, 'test', c);
 %
 
 % Display train images in Figure 1
-train_labels = [1,1,1,1,1,2,2,2,2,2]; classes = {'Male','Female'};
+train_labels = transpose(genderdata(1:100)); classes = {'Male','Female'};
 unique_labels = unique(train_labels);
 numPerClass = max(histc(train_labels, unique_labels));
 h = figure(1); set(h, 'name', 'Train Images'); border = 10;
@@ -58,7 +59,8 @@ for i=1:length(unique_labels)
 end
 
 % Display test images and nearest neighbor from train images in Figure 2
-test_labels = info.test_labels; classes = info.classes;
+ 
+test_labels = transpose(genderdata(101:104)); classes = {'Male','Female'};
 numPerClass = max(histc(test_labels, unique_labels));
 h = figure(2); set(h, 'name', 'Test Images'); border = 10;
 [~, nn_idx] = min(sp_dist2(train_features, test_features));

@@ -14,7 +14,7 @@ for i in range(0,len(content)+1):
         string+=arr[0]
         #print arr[0]
         string+='/'
-        string+='course_tilt_aligned_face.'
+        string+='coarse_tilt_aligned_face.'
         string+=arr[2]
         string+='.'
         string+=arr[1]
