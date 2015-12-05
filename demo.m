@@ -15,9 +15,9 @@ gendertraindata=importdata('facePaths-AllTrainLabels.txt');
 gendertestdata=importdata('facePaths-AllTestLabels.txt');
 % Initialize variables for calling datasets_feature function
 info = load('images/filelist.mat');
-datasets = {'demo13'};
-train_lists = {cellstr(mytraindata)};
-test_lists = {cellstr(mytestdata)};
+datasets = {'demo14'};
+train_lists = {cellstr(mytraindata(1:50))};
+test_lists = {cellstr(mytestdata(1:50))};
 feature = 'sift';
 
 % Load the configuration and set dictionary size to 20 (for fast demo)
@@ -46,7 +46,7 @@ test_features = load_feature(datasets{1}, feature, 'test', c);
 %
 
 % Display train images in Figure 1
-train_labels = transpose(gendertraindata); classes = {'Male','Female'};
+train_labels = transpose(gendertraindata(1:50)); classes = {'Male','Female'};
 unique_labels = unique(train_labels);
 numPerClass = max(histc(train_labels, unique_labels));
 h = figure(1); set(h, 'name', 'Train Images'); border = 10;
@@ -63,7 +63,7 @@ end
 
 % Display test images and nearest neighbor from train images in Figure 2
  
-test_labels = transpose(gendertestdata); classes = {'Male','Female'};
+test_labels = transpose(gendertestdata(1:50)); classes = {'Male','Female'};
 numPerClass = max(histc(test_labels, unique_labels));
 h = figure(2); set(h, 'name', 'Test Images'); border = 10;
 [~, nn_idx] = min(sp_dist2(train_features, test_features));
@@ -87,14 +87,17 @@ end
 %
 % Sample code for usage of features with Liblinear SVM classifier:
    C_values = [1e-4 1e-3 1e-2  1e-1 1 10 100 1000 10000];
-   accuracies=zeros(length(C_values),1);
+   G_values = [1e-4 1e-3 1e-2  1e-1 1 10 100 1000 10000];
+   accuracies=zeros(length(C_values),length(G_values));
    for i= 1:length(C_values)
-   svm_options = ['-s 0 -t 0 -c ' num2str(C_values(i))]
-   model = svmtrain(transpose(train_labels), double(train_features), svm_options);
-   predicted_labels = svmpredict(transpose(test_labels), sparse(double(test_features)), model);
-   accuracies(i) = sum(transpose(test_labels)==predicted_labels)/length(test_labels)
+        for j = 1:length(G_values)
+            svm_options = ['-s 0 -t 2 -c ' num2str(C_values(i)) ' -g ' num2str(G_values(j))]
+            model = svmtrain(transpose(train_labels), double(train_features), svm_options);
+            predicted_labels = svmpredict(transpose(test_labels), sparse(double(test_features)), model);
+            accuracies(i,j) = sum(transpose(test_labels)==predicted_labels)/length(test_labels)
+       end
    end
    
-   figure
-   semilogx (C_values, accuracies)
+  % figure
+  % semilogx (C_values, accuracies)
 %
