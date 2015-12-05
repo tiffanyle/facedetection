@@ -9,13 +9,15 @@
 
 addpath(genpath(pwd));
 addpath utils/libsvm/matlab
-mydata=importdata('facePaths.txt');
-genderdata=importdata('faceGenderTrain.txt');
+mytraindata=importdata('facePaths-AllTrain.txt');
+mytestdata=importdata('facePaths-AllTest.txt');
+gendertraindata=importdata('facePaths-AllTrainLabels.txt');
+gendertestdata=importdata('facePaths-AllTestLabels.txt');
 % Initialize variables for calling datasets_feature function
 info = load('images/filelist.mat');
-datasets = {'demo9'};
-train_lists = {cellstr(mydata(1:100))};
-test_lists = {cellstr(mydata(101:104))};
+datasets = {'demo13'};
+train_lists = {cellstr(mytraindata)};
+test_lists = {cellstr(mytestdata)};
 feature = 'sift';
 
 % Load the configuration and set dictionary size to 20 (for fast demo)
@@ -28,7 +30,8 @@ datasets_feature(datasets, train_lists, test_lists, feature, c);
 % Load train and test features
 train_features = load_feature(datasets{1}, feature, 'train', c);
 test_features = load_feature(datasets{1}, feature, 'test', c);
-
+%train_features = extract_hog_features(cellstr(mydata(1:100)));
+%test_features = extract_hog_features(cellstr(mydata(101:200)));
 % Below is a simple nearest-neighbor classifier
 %  The display code is more complicated than finding the actual nearest
 %  neighbor. Only two lines are required to find the nearest neighbor:
@@ -43,7 +46,7 @@ test_features = load_feature(datasets{1}, feature, 'test', c);
 %
 
 % Display train images in Figure 1
-train_labels = transpose(genderdata(1:100)); classes = {'Male','Female'};
+train_labels = transpose(gendertraindata); classes = {'Male','Female'};
 unique_labels = unique(train_labels);
 numPerClass = max(histc(train_labels, unique_labels));
 h = figure(1); set(h, 'name', 'Train Images'); border = 10;
@@ -60,7 +63,7 @@ end
 
 % Display test images and nearest neighbor from train images in Figure 2
  
-test_labels = transpose(genderdata(101:104)); classes = {'Male','Female'};
+test_labels = transpose(gendertestdata); classes = {'Male','Female'};
 numPerClass = max(histc(test_labels, unique_labels));
 h = figure(2); set(h, 'name', 'Test Images'); border = 10;
 [~, nn_idx] = min(sp_dist2(train_features, test_features));
@@ -83,7 +86,15 @@ end
 
 %
 % Sample code for usage of features with Liblinear SVM classifier:
-   svm_options = '-s 0 -t 0';
+   C_values = [1e-4 1e-3 1e-2  1e-1 1 10 100 1000 10000];
+   accuracies=zeros(length(C_values),1);
+   for i= 1:length(C_values)
+   svm_options = ['-s 0 -t 0 -c ' num2str(C_values(i))]
    model = svmtrain(transpose(train_labels), double(train_features), svm_options);
    predicted_labels = svmpredict(transpose(test_labels), sparse(double(test_features)), model);
+   accuracies(i) = sum(transpose(test_labels)==predicted_labels)/length(test_labels)
+   end
+   
+   figure
+   semilogx (C_values, accuracies)
 %
