@@ -24,17 +24,21 @@ for i in range(0,len(content)+1):
 
 print 'length', len(content)
 for i in range(0,len(content)+1):
-    print "content", type(content[i])
+    #print "content", type(content[i])
     arr = content[i].split()
-    #print "arr", arr
-    with open("facePaths-TestLabels1.txt", "a") as myfile:
+    count = 0
+    print "arr", arr
+    with open("facePaths-TrainLabels1.txt", "a") as myfile:
         string = ''
-        if arr[5]=='m':
+        if arr[5]=='m' or arr[4] == 'm':
             string='1'+'\n'
-        elif arr[5] == 'f':
+        elif arr[5] == 'f' or arr[4] == 'f':
             string='2'+'\n'
         else:
+            count+=1
+            print "COUNT**", count
             pass
         
         #print string
         myfile.write(string)
+print "UNACCOUNTED FOR", count
