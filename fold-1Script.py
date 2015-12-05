@@ -1,6 +1,6 @@
 count = 0
 
-with open('fold_1_data.txt','r') as f:
+with open('fold_2_data.txt','r') as f:
     content = f.readlines()
 '''
 print 'length', len(content)
@@ -28,12 +28,12 @@ for i in range(0,len(content)+1):
     arr = content[i].split()
     count = 0
     #print "arr", arr
-    with open("facePaths-TrainLabels1.txt", "a") as myfile:
+    with open("facePaths-TrainLabels2.txt", "a") as myfile:
         string = ''
         if arr[5]=='m' or arr[4] == 'm':
             label='1'+'\n'
             myfile.write(label)
-            with open("facePaths-Train1.txt", "a") as myfile2:
+            with open("facePaths-Train2.txt", "a") as myfile2:
                 string = 'faces/'
                 string+=arr[0]
                 #print arr[0]
@@ -48,7 +48,7 @@ for i in range(0,len(content)+1):
         elif arr[5] == 'f' or arr[4] == 'f':
             label='2'+'\n'
             myfile.write(label)
-            with open("facePaths-Train1.txt", "a") as myfile2:
+            with open("facePaths-Train2.txt", "a") as myfile2:
                 string = 'faces/'
                 string+=arr[0]
                 #print arr[0]
